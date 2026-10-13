@@ -1,0 +1,22 @@
+{
+  "name": "contador-visitas-simcot",
+  "label": "Contador de Visitas SIMCOT",
+  "type": "widget",
+  "version": "1.21.0",
+  "exbVersion": "1.21.0",
+  "author": "IDEAM - Subdirección de Ecosistemas",
+  "description": "Widget institucional de monitoreo de visitas e impacto para el Sistema de Monitoreo de las Coberturas de la Tierra (SIMCOT) con branding oficial IDEAM.",
+  "copyright": "IDEAM 2026",
+  "license": "http://www.apache.org/licenses/LICENSE-2.0",
+  "properties": {
+    "hasSetting": true
+  },
+  "translatedLocales": [
+    "en",
+    "es"
+  ],
+  "defaultSize": {
+    "width": 380,
+    "height": 380
+  }
+}

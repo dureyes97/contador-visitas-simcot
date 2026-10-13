@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contador de Visitas e Impacto • SIMCOT - IDEAM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand-primary: #087f9b;
+      --brand-primary-dark: #002625;
+      --brand-forest: #126057;
+      --brand-emerald: #10b981;
+      --brand-coral: #fc3b36;
+      --brand-muted: #3d6665;
+      --bg-surface: #ffffff;
+      --bg-alt: #f0f8f9;
+      --border-subtle: #cde4e8;
+      --border-focus: #087f9b;
+      --shadow-card: 0 10px 30px -5px rgba(8, 127, 155, 0.15), 0 4px 12px -2px rgba(0, 38, 37, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: transparent;
+      color: var(--brand-primary-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 12px;
+      user-select: none;
+    }
+
+    .simcot-container {
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 18px 22px;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all 0.3s ease;
+    }
+
+    /* Franja superior institucional con gradiente IDEAM / SIMCOT */
+    .brand-stripe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #087f9b 0%, #126057 50%, #10b981 100%);
+    }
+
+    /* Encabezado */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 2px;
+    }
+
+    .brand-identity {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      height: 42px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(8, 127, 155, 0.2));
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-tag {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--brand-primary);
+    }
+
+    .brand-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: var(--brand-primary-dark);
+      letter-spacing: -0.015em;
+      margin: 1px 0 0 0;
+      line-height: 1.15;
+    }
+
+    .brand-sub {
+      font-size: 0.70rem;
+      color: var(--brand-muted);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .pulse-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #e6f7f4;
+      border: 1px solid #a3e3d6;
+      color: #0d705c;
+      padding: 3px 9px;
+      border-radius: 9999px;
+      font-size: 0.66rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 9999px;
+      background: var(--brand-emerald);
+      box-shadow: 0 0 8px var(--brand-emerald);
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(0.85); }
+    }
+
+    /* Caja del odómetro de dígitos */
+    .counter-display-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #f0f8f9 0%, #e8f4f6 100%);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: inset 0 2px 5px rgba(8, 127, 155, 0.05);
+    }
+
+    .odometer-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 6px;
+    }
+
+    .odometer-digit {
+      width: 34px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #ffffff;
+      background: linear-gradient(180deg, #002625 0%, #087f9b 100%);
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(8, 127, 155, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .odometer-separator {
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--brand-primary);
+      margin: 0 1px;
+      padding-bottom: 8px;
+    }
+
+    .counter-label {
+      font-size: 0.74rem;
+      color: var(--brand-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    .counter-label svg {
+      color: var(--brand-primary);
+    }
+
+    /* Cuadrícula de estadísticas complementarias */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .stat-box {
+      background: #fbfdfd;
+      border: 1px solid #ddecfa;
+      border-radius: 10px;
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+    .stat-box:hover {
+      border-color: var(--brand-primary);
+      transform: translateY(-1px);
+    }
+
+    .stat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #e2f2f5;
+      color: var(--brand-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .stat-meta {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .stat-meta-name {
+      font-size: 0.64rem;
+      color: var(--brand-muted);
+      font-weight: 600;
+      line-height: 1.1;
+    }
+
+    .stat-meta-val {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: var(--brand-primary-dark);
+      margin-top: 2px;
+    }
+
+    /* Barra inferior */
+    .footer-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 10px;
+      border-top: 1px solid #e5f1f3;
+    }
+
+    .sync-info {
+      font-size: 0.67rem;
+      color: var(--brand-muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.70rem;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 7px;
+      border: 1px solid var(--border-subtle);
+      background: #ffffff;
+      color: var(--brand-primary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+    .btn:hover {
+      background: #eaf5f7;
+      border-color: var(--brand-primary);
+      color: var(--brand-primary-dark);
+    }
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .spin {
+      animation: spinAnim 1s linear infinite;
+    }
+
+    @keyframes spinAnim {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Modal emergente para incrustar */
+    .embed-snippet-container {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 6px;
+      padding: 10px;
+      background: #002625;
+      border-radius: 8px;
+      color: #bbf7d0;
+      font-family: Consolas, monospace;
+      font-size: 0.68rem;
+    }
+    .embed-snippet-container.active {
+      display: flex;
+    }
+    .embed-snippet-code {
+      word-break: break-all;
+      color: #a7f3d0;
+    }
+    .btn-copy {
+      align-self: flex-end;
+      background: #087f9b;
+      color: #ffffff;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 5px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-copy:hover {
+      background: #10b981;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 16px;
+      background: #002625;
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      display: none;
+      align-items: center;
+      gap: 6px;
+      z-index: 100;
+    }
+    .toast.show {
+      display: flex;
+    }
+
+    @media (max-width: 380px) {
+      .odometer-digit {
+        width: 28px;
+        height: 40px;
+        font-size: 1.5rem;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="simcot-container">
+    <div class="brand-stripe"></div>
+
+    <!-- Header con Brand IDEAM / SIMCOT -->
+    <header class="header">
+      <div class="brand-identity">
+        <img
+          src="data:image/png;base64,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"
+          alt="Logo Oficial IDEAM"
+          class="brand-logo"
+        >
+        <div class="brand-text">
+          <span class="brand-tag">IDEAM • COLOMBIA</span>
+          <h1 class="brand-title">SIMCOT</h1>
+          <span class="brand-sub">Monitoreo de Coberturas de la Tierra</span>
+        </div>
+      </div>
+
+      <div class="pulse-badge" title="Sincronización en vivo con ArcGIS Online">
+        <span class="pulse-dot"></span>
+        <span>En vivo</span>
+      </div>
+    </header>
+
+    <!-- Visualizador central de visitas oficiales -->
+    <section class="counter-display-card">
+      <div class="odometer-wrapper" id="odometerFrame">
+        <!-- Generado dinámicamente -->
+      </div>
+      <div class="counter-label">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="13" r="3"></circle>
+        </svg>
+        <span>Vistas oficiales en ArcGIS StoryMaps</span>
+      </div>
+    </section>
+
+    <!-- Métricas clave del ecosistema SIMCOT -->
+    <section class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" x2="12" y1="20" y2="10"></line><line x1="18" x2="18" y1="20" y2="4"></line><line x1="6" x2="6" y1="20" y2="16"></line>
+          </svg>
+        </div>
+        <div class="stat-meta">
+          <span class="stat-meta-name">Tablero de Estadísticas</span>
+          <span class="stat-meta-val" id="valTablero">22.011 vistas</span>
+        </div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"></path>
+            <path d="m22 12.5-8.58 3.91a2 2 0 0 1-1.66 0L2 12.5"></path>
+            <path d="m22 17.5-8.58 3.91a2 2 0 0 1-1.66 0L2 17.5"></path>
+          </svg>
+        </div>
+        <div class="stat-meta">
+          <span class="stat-meta-name">Metodología CORINE</span>
+          <span class="stat-meta-val">Escala 1:100.000</span>
+        </div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <div class="stat-meta">
+          <span class="stat-meta-name">Tu Sesión Local</span>
+          <span class="stat-meta-val" id="valSession">Visita activa</span>
+        </div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+        <div class="stat-meta">
+          <span class="stat-meta-name">Periodos Oficiales</span>
+          <span class="stat-meta-val">2000 - 2022</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Barra de sincronización y utilidades -->
+    <footer class="footer-bar">
+      <div class="sync-info">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span id="syncTimestamp">Sincronizado: En línea</span>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="btnToggleEmbed" title="Obtener código iframe para incrustar en StoryMap">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline>
+          </svg>
+          <span>Incrustar</span>
+        </button>
+
+        <button class="btn" id="btnRefresh" title="Actualizar datos en tiempo real">
+          <svg id="iconRefresh" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path>
+          </svg>
+          <span>Actualizar</span>
+        </button>
+      </div>
+    </footer>
+
+    <!-- Bloque de código para incrustar en StoryMap -->
+    <div class="embed-snippet-container" id="embedContainer">
+      <span style="font-size:0.6rem;color:#94a3b8;font-family:sans-serif;font-weight:600;">CÓDIGO IFRAME PARA ARCGIS STORYMAPS (BLOQUE DE INCRUSTAR):</span>
+      <code class="embed-snippet-code" id="embedCodeSnippet">&lt;iframe src="https://dureyes97.github.io/contador-visitas-simcot/" width="100%" height="340" frameborder="0" style="border:none;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,0.08);"&gt;&lt;/iframe&gt;</code>
+      <button class="btn-copy" id="btnCopySnippet">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+        </svg>
+        <span>Copiar iframe</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span id="toastMsg">¡Código copiado al portapapeles!</span>
+  </div>
+
+  <script>
+    const STORYMAP_ITEM_ID = '6b45024fb7a247219c33adc524345589';
+    const TABLERO_ITEM_ID = '6f82270e8c2b4872979478f43e1494d5';
+    const AGOL_SHARING_URL = 'https://www.arcgis.com/sharing/rest/content/items';
+
+    let currentViews = 24390;
+    let currentTableroViews = 22011;
+
+    // Registrar y contar visita en localStorage
+    function registerLocalVisit() {
+      try {
+        const visitKey = 'simcot_local_visits';
+        let count = parseInt(localStorage.getItem(visitKey) || '0', 10);
+        count += 1;
+        localStorage.setItem(visitKey, count.toString());
+        document.getElementById('valSession').textContent = `Tu visita #${count}`;
+      } catch (e) {
+        document.getElementById('valSession').textContent = 'Sesión activa';
+      }
+    }
+
+    // Renderizar los dígitos del odómetro con separador de miles
+    function renderOdometer(number) {
+      const container = document.getElementById('odometerFrame');
+      container.innerHTML = '';
+      const formatted = number.toLocaleString('es-CO');
+
+      for (let i = 0; i < formatted.length; i++) {
+        const char = formatted[i];
+        if (char === '.' || char === ',') {
+          const sep = document.createElement('span');
+          sep.className = 'odometer-separator';
+          sep.textContent = char;
+          container.appendChild(sep);
+        } else {
+          const tile = document.createElement('div');
+          tile.className = 'odometer-digit';
+          tile.textContent = char;
+          container.appendChild(tile);
+        }
+      }
+    }
+
+    // Sincronizar estadísticas en tiempo real con la API de ArcGIS Online
+    async function syncStats(isManual = false) {
+      const refreshIcon = document.getElementById('iconRefresh');
+      if (isManual) {
+        refreshIcon.classList.add('spin');
+      }
+
+      try {
+        // 1. Obtener vistas de la StoryMap SIMCOT
+        const resStory = await fetch(`${AGOL_SHARING_URL}/${STORYMAP_ITEM_ID}?f=json`, { cache: 'no-store' });
+        if (resStory.ok) {
+          const dataStory = await resStory.json();
+          if (dataStory && typeof dataStory.numViews === 'number') {
+            currentViews = dataStory.numViews;
+            renderOdometer(currentViews);
+          }
+        }
+
+        // 2. Obtener vistas del Tablero de Estadísticas ExB
+        const resTablero = await fetch(`${AGOL_SHARING_URL}/${TABLERO_ITEM_ID}?f=json`, { cache: 'no-store' });
+        if (resTablero.ok) {
+          const dataTablero = await resTablero.json();
+          if (dataTablero && typeof dataTablero.numViews === 'number') {
+            currentTableroViews = dataTablero.numViews;
+            document.getElementById('valTablero').textContent = `${currentTableroViews.toLocaleString('es-CO')} vistas`;
+          }
+        }
+
+        const now = new Date();
+        document.getElementById('syncTimestamp').textContent = `Sincronizado: ${now.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+      } catch (err) {
+        console.warn('Conexión con ArcGIS Online en modo caché:', err);
+      } finally {
+        if (isManual) {
+          setTimeout(() => refreshIcon.classList.remove('spin'), 600);
+        }
+      }
+    }
+
+    // Mostrar Notificación Toast
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    // Eventos UI
+    document.getElementById('btnRefresh').addEventListener('click', () => {
+      syncStats(true);
+    });
+
+    const embedBox = document.getElementById('embedContainer');
+    document.getElementById('btnToggleEmbed').addEventListener('click', () => {
+      embedBox.classList.toggle('active');
+    });
+
+    document.getElementById('btnCopySnippet').addEventListener('click', () => {
+      const snippet = document.getElementById('embedCodeSnippet').textContent;
+      navigator.clipboard.writeText(snippet).then(() => {
+        showToast('¡Código iframe copiado para StoryMaps!');
+      }).catch(() => {
+        showToast('Código disponible en pantalla');
+      });
+    });
+
+    // Inicialización
+    registerLocalVisit();
+    renderOdometer(currentViews);
+    syncStats(false);
+
+    // Auto-refresco cada 30 segundos
+    setInterval(() => syncStats(false), 30000);
+  </script>
+</body>
+</html>

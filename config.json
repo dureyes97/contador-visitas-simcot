@@ -1,0 +1,9 @@
+{
+  "portalUrl": "https://www.arcgis.com",
+  "itemId": "6b45024fb7a247219c33adc524345589",
+  "widgetTitle": "Visitas Registradas SIMCOT",
+  "siteName": "Sistema de Monitoreo de las Coberturas de la Tierra",
+  "refreshIntervalSec": 30,
+  "showTableroStats": true,
+  "tableroItemId": "6f82270e8c2b4872979478f43e1494d5"
+}
